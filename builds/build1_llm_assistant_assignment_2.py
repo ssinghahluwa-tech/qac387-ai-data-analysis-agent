@@ -51,7 +51,7 @@ libraries so run the requirements.txt file to install them.
 3) Run it 3 times to see the differences between no memory, memory, and streaming modes:
 
 Run 1 (no memory):
-python builds/build1_llm_assistant_assignment_2.py --data data/penguins.csv
+python3 builds/build1_llm_assistant_assignment_2.py --data data/penguins.csv
 
 This will start an interactive command-line interface where you can ask questions about the dataset.
 
@@ -130,6 +130,8 @@ Suggested Analysis:
 
 Clarifying Questions:
 - Ask 0–3 follow-up questions if useful.
+
+If the user asks a direct question about the dataset schema, answer the question directly first, then follow the format above.
 """
 
 
