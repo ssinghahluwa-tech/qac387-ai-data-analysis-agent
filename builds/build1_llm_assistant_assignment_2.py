@@ -105,13 +105,31 @@ from src import ensure_dirs, read_data, basic_profile
 #
 # Tip: Keep it short and explicit. You can iterate after testing.
 SYSTEM_PROMPT = """
-TODO: Replace this with your own system prompt.
+You are a data analysis assistant helping a student explore a dataset.
 
-Required elements:
-- Role
-- Only sees schema
-- No hallucinated columns
-- Output format instructions
+You ONLY have access to the dataset schema (rows, column names, and data types).
+You cannot see the actual data values.
+
+Rules:
+- Only refer to columns listed in the schema.
+- Do NOT invent or assume columns that are not listed.
+- If a user asks about a column that does not exist, say it is not in the schema.
+
+When answering, use this format:
+
+Research Questions:
+- List 3–5 possible research questions.
+
+Variables:
+- Outcomes:
+- Predictors:
+- Controls / confounders:
+
+Suggested Analysis:
+- Possible methods (e.g., regression, correlation, group comparison)
+
+Clarifying Questions:
+- Ask 0–3 follow-up questions if useful.
 """
 
 
@@ -136,7 +154,7 @@ def profile_to_schema_text(profile: dict) -> str:
         "",
         "Columns and dtypes:",
     ]
-    for col in profile["_____"]:
+    for col in profile["columns"]:
         lines.append(f"- {col}: {profile['dtypes'].get(col)}")
 
     return "\n".join(lines)
@@ -159,14 +177,14 @@ def build_chain(
     if memory:
         prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", _________),
+                ("system", SYSTEM_PROMPT),
                 ("human", "Dataset schema:\n{schema_text}"),
                 MessagesPlaceholder(variable_name="history"),
                 ("human", "User question:\n{user_query}"),
             ]
         )
 
-        base_chain = prompt | ______ | StrOutputParser()
+        base_chain = prompt | llm | StrOutputParser()
 
         history = InMemoryChatMessageHistory()
         chain_with_history = RunnableWithMessageHistory(
@@ -244,28 +262,31 @@ def main():
     )
 
     parser.add_argument(
-        "_____",
-        type=_____,
-        required=_____,
+        "--data",
+        type=str,
+        required=True,
         help="Path to CSV file",
     )
-    parser.add_argument("--report_dir", type=str, default="_____")
-    parser.add_argument("--model", type=str, default="_____")
-    parser.add_argument("--temperature", type=float, default=_____)
+
+    parser.add_argument("--report_dir", type=str, default="reports")
+    parser.add_argument("--model", type=str, default="gpt-4o-mini")
+    parser.add_argument("--temperature", type=float, default=0.2)
 
     parser.add_argument(
         "--quiet_schema",
-        action="_____",
+        action="store_true",
         help="Do not print schema automatically at startup",
     )
+
     parser.add_argument(
         "--memory",
-        action="_____",
+        action="store_true",
         help="Enable conversation memory for this session",
     )
+
     parser.add_argument(
         "--stream",
-        action="_____",
+        action="store_true",
         help="Stream model output to terminal as it is generated",
     )
 
@@ -291,7 +312,7 @@ def main():
         model=args.model,
         temperature=args.temperature,
         stream=args.stream,
-        memory=args.________,
+        memory=args.memory,
     )
 
     while True:
