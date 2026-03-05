@@ -65,7 +65,7 @@ reference previous answers to ensure that memory is working as expected.
 
 Run 3 (with streaming): you can also enable streaming output to see the model's response as it is generated:
 
-python builds/build1_llm_assistant_assignment_2.py --data data/penguins.csv --memory --stream
+python3 builds/build1_llm_assistant_assignment_2.py --data data/penguins.csv --memory --stream
 """
 
 # This import allows us to use modern Python type hints which helps developers understand
