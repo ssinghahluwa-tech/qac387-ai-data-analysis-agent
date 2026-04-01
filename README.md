@@ -6,7 +6,6 @@
 
 ---
 
-## Assignment Overview
 
 In this assignment, you will complete **Build 0** of a data analysis pipeline.  
 
